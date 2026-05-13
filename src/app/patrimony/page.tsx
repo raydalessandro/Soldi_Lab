@@ -2,6 +2,7 @@
 
 import { Info, Plus, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { PageHeader } from "@/components/PageHeader";
 import { AssetCard } from "@/components/patrimony/AssetCard";
 import { AssetForm } from "@/components/patrimony/AssetForm";
@@ -69,6 +70,13 @@ export default function PatrimonyPage() {
             </button>
           </div>
         }
+      />
+
+      <OnboardingBanner
+        storageKey="patrimony-rule"
+        title="Ogni asset ha una funzione"
+        body="Reserve protegge in emergenza, productive lavora e rende, parked è fermo senza piano. Etichetta gli asset onestamente."
+        tone="sky"
       />
 
       <PatrimonyHeader breakdown={breakdown} />
