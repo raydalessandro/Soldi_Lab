@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AppBootstrap } from "@/components/AppBootstrap";
 import { AppHeader } from "@/components/AppHeader";
 import { BottomNav } from "@/components/BottomNav";
+import { SpaceSwitcherMount } from "@/components/SpaceSwitcherMount";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -52,8 +54,11 @@ export default function RootLayout({
       <body className="min-h-full bg-stone-50 font-sans text-stone-900">
         <div className="mx-auto flex min-h-screen max-w-md flex-col bg-stone-50">
           <AppHeader />
-          <main className="flex-1 pb-24">{children}</main>
+          <main className="flex flex-1 flex-col pb-24">
+            <AppBootstrap>{children}</AppBootstrap>
+          </main>
           <BottomNav />
+          <SpaceSwitcherMount />
         </div>
       </body>
     </html>
