@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans);
+}
+
+html,
+body {
+  -webkit-tap-highlight-color: transparent;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* Numeri tabulari per importi: allineamento verticale costante in EUR. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inertizza l'auto-zoom su mobile quando un input numerico riceve focus. */
+input[type="number"],
+input[type="text"] {
+  font-size: 16px;
+}

@@ -5,8 +5,11 @@ import {
   Edit3, X, Info, AlertCircle, Copy, Download,
   Archive, RotateCcw, Shield, Zap, Anchor,
   Heart, Building, Coffee, MoreVertical, Search,
-  Activity, BookOpen
+  Activity, BookOpen, Banknote, ExternalLink
 } from 'lucide-react';
+
+// Link all'app madre dell'ecosistema EAR Lab Famiglia
+const PARENT_APP_URL = 'https://la-famiglia-alpha.vercel.app';
 
 // ============= COSTANTI =============
 
@@ -293,7 +296,7 @@ function computeInsights(floor, income, assets) {
 // ============= COMPONENTI BASE =============
 
 const PageHeader = ({ title, onBack, action }) => (
-  <div className="sticky top-0 z-10 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between">
+  <div className="sticky top-[52px] z-10 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between">
     <div className="flex items-center gap-3">
       {onBack && (
         <button onClick={onBack} className="p-1 -ml-1 active:bg-stone-100 rounded-lg">
@@ -306,17 +309,47 @@ const PageHeader = ({ title, onBack, action }) => (
   </div>
 );
 
+// Header globale sticky: logo Soldi_Lab a sinistra + link diretto all'app madre La Famiglia Alpha.
+// Il logo è anche l'icona PWA quando l'app viene installata sul telefono.
+const AppHeader = () => (
+  <div className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200 px-4 py-2 flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <img
+        src="./assets/logo.png"
+        alt="Soldi_Lab"
+        className="w-9 h-9 rounded-lg object-cover"
+      />
+      <div className="leading-tight">
+        <div className="text-[9px] uppercase tracking-widest text-stone-400 font-medium">Polo B</div>
+        <div className="text-xs font-semibold tracking-tight">Soldi_Lab</div>
+      </div>
+    </div>
+    <a
+      href={PARENT_APP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-stone-100 active:bg-stone-200 text-stone-700"
+      title="Apri La Famiglia Alpha"
+    >
+      <Building className="w-3.5 h-3.5" />
+      <span className="text-[11px] font-semibold">La Famiglia</span>
+      <ExternalLink className="w-3 h-3 opacity-60" />
+    </a>
+  </div>
+);
+
 const BottomNav = ({ current, onChange }) => {
   const items = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'floor', label: 'Floor', icon: Wallet },
+    { id: 'income', label: 'Entrate', icon: Banknote },
     { id: 'patrimony', label: 'Patrimonio', icon: TrendingUp },
     { id: 'cycle', label: 'Ciclo', icon: Activity },
     { id: 'advisor', label: 'Advisor', icon: Sparkles },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-2 py-2 z-20">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-1 py-2 z-20">
       <div className="max-w-md mx-auto flex items-center justify-around">
         {items.map(item => {
           const Icon = item.icon;
@@ -325,7 +358,7 @@ const BottomNav = ({ current, onChange }) => {
             <button
               key={item.id}
               onClick={() => onChange(item.id)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors flex-1 ${active ? 'text-stone-900' : 'text-stone-400'}`}
+              className={`flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg transition-colors flex-1 ${active ? 'text-stone-900' : 'text-stone-400'}`}
             >
               <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
               <span className="text-[10px] font-medium">{item.label}</span>
@@ -442,6 +475,33 @@ const Dashboard = ({ state, onNavigate, onOpenSpaceSwitcher }) => {
             <BreakdownCell color="bg-rose-500" label="Essenziale" value={formatEUR(insights.floorByLevel.essential)} />
             <BreakdownCell color="bg-indigo-500" label="Standard" value={formatEUR(insights.floorByLevel.baseline)} />
             <BreakdownCell color="bg-amber-500" label="Lifestyle" value={formatEUR(insights.floorByLevel.lifestyle)} />
+          </div>
+        </button>
+      </div>
+
+      {/* Entrate mensili */}
+      <div className="px-4 mt-3">
+        <button
+          onClick={() => onNavigate('income')}
+          className="w-full bg-white rounded-2xl border border-stone-200 p-4 active:bg-stone-50 text-left"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-semibold uppercase tracking-wider text-stone-500">Entrate mensili</div>
+            <ChevronRight className="w-4 h-4 text-stone-300" />
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="text-2xl font-bold tracking-tight tabular-nums text-emerald-700">
+                {formatEUR(insights.incomeMonthly)}
+              </div>
+              <div className="text-xs text-stone-500 mt-0.5">flussi stabili normalizzati al mese</div>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">
+              <Banknote className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-semibold">
+                {state.income.filter(i => i.active).length} attive
+              </span>
+            </div>
           </div>
         </button>
       </div>
@@ -656,7 +716,7 @@ const FloorPage = ({ state, onNavigate, onUpdate }) => {
       </div>
 
       {/* Filtri */}
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-12 bg-stone-50 z-10 py-2">
+      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-[104px] bg-stone-50 z-[5] py-2">
         {[
           { id: 'all', label: 'Tutte' },
           { id: 'essential', label: 'Essenziale' },
@@ -933,6 +993,276 @@ const FloorItemEditor = ({ item, onClose, onSave }) => {
   );
 };
 
+// ============= INCOME PAGE =============
+
+const IncomePage = ({ state, onNavigate, onUpdate }) => {
+  const [editingItem, setEditingItem] = useState(null);
+  const [showInfo, setShowInfo] = useState(false);
+
+  const insights = useMemo(() => computeInsights(state.floor, state.income, state.assets), [state]);
+
+  const activeItems = [...state.income].filter(i => i.active)
+    .sort((a, b) => toMonthly(b.amount, b.frequency) - toMonthly(a.amount, a.frequency));
+  const dormantItems = state.income.filter(i => !i.active);
+
+  return (
+    <div className="pb-24">
+      <PageHeader
+        title="Entrate"
+        onBack={() => onNavigate('dashboard')}
+        action={
+          <div className="flex gap-1">
+            <button onClick={() => setShowInfo(true)} className="p-2 -mr-1">
+              <Info className="w-5 h-5 text-stone-500" />
+            </button>
+            <button className="p-2 -mr-2">
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+        }
+      />
+
+      {/* Header con totale */}
+      <div className="px-4 py-4">
+        <div className="text-[10px] uppercase tracking-widest text-stone-400 font-medium mb-1">Entrate totali mensili</div>
+        <div className="text-3xl font-bold tracking-tight tabular-nums text-emerald-700">{formatEUR(insights.incomeMonthly)}</div>
+        <div className="text-xs text-stone-500 mt-0.5">flussi stabili normalizzati al mese</div>
+      </div>
+
+      {/* Lista entrate attive */}
+      <div className="px-4 pt-2 space-y-2">
+        {activeItems.map(item => (
+          <IncomeItemCard
+            key={item.id}
+            item={item}
+            onEdit={() => setEditingItem(item)}
+            onQuickAmountChange={(newAmount) => onUpdate('income', item.id, { amount: newAmount })}
+          />
+        ))}
+
+        {activeItems.length === 0 && (
+          <div className="text-center py-12 text-stone-400">
+            <Banknote className="w-12 h-12 mx-auto mb-2 opacity-30" />
+            <div className="text-sm">Nessuna entrata registrata</div>
+            <div className="text-xs mt-1">Tap + per aggiungere stipendio, pensione o affitto attivo</div>
+          </div>
+        )}
+
+        {dormantItems.length > 0 && (
+          <>
+            <div className="text-[10px] uppercase tracking-widest text-stone-400 font-medium pt-4 pb-1 px-1">Dormienti</div>
+            {dormantItems.map(item => (
+              <IncomeItemCard
+                key={item.id}
+                item={item}
+                onEdit={() => setEditingItem(item)}
+                onQuickAmountChange={(newAmount) => onUpdate('income', item.id, { amount: newAmount })}
+              />
+            ))}
+          </>
+        )}
+      </div>
+
+      {/* Modal info */}
+      {showInfo && (
+        <div className="fixed inset-0 bg-black/40 z-30 flex items-end" onClick={() => setShowInfo(false)}>
+          <div className="bg-white w-full rounded-t-3xl p-4 pb-8 max-w-md mx-auto" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-4" />
+            <h2 className="text-lg font-semibold mb-3">Cosa entra nelle Entrate</h2>
+            <p className="text-sm text-stone-700 leading-relaxed mb-3">
+              Solo <strong>flussi stabili e ricorrenti</strong>: stipendio, pensione, affitti attivi, consulenze regolari, rendite.
+            </p>
+            <p className="text-sm text-stone-700 leading-relaxed mb-4">
+              <strong>Fuori scope:</strong> bonus una tantum, vendite occasionali, rimborsi. Quelli sono extra e si gestiscono sul margine.
+            </p>
+            <button onClick={() => setShowInfo(false)} className="w-full bg-stone-900 text-white py-3 rounded-xl text-sm font-medium">
+              Ho capito
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal edit voce */}
+      {editingItem && (
+        <IncomeItemEditor
+          item={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSave={(updates) => {
+            onUpdate('income', editingItem.id, updates);
+            setEditingItem(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+const IncomeItemCard = ({ item, onEdit, onQuickAmountChange }) => {
+  const monthly = toMonthly(item.amount, item.frequency);
+  const isNotMonthly = item.frequency !== 'monthly';
+  const [editingAmount, setEditingAmount] = useState(false);
+  const [tempAmount, setTempAmount] = useState(item.amount.toString());
+
+  const handleSaveAmount = () => {
+    const n = parseFloat(tempAmount);
+    if (!isNaN(n) && n >= 0) {
+      onQuickAmountChange(n);
+    }
+    setEditingAmount(false);
+  };
+
+  return (
+    <div className={`bg-white rounded-2xl border p-3 ${item.active ? 'border-stone-200' : 'border-stone-200 opacity-60'}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0 pr-2">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
+              Entrata
+            </span>
+            {!item.active && (
+              <span className="text-[9px] uppercase tracking-wider text-stone-400 font-medium">Dormiente</span>
+            )}
+          </div>
+          <div className="text-sm font-semibold">{item.name}</div>
+          {item.note && (
+            <div className="text-[11px] text-stone-500 mt-0.5">{item.note}</div>
+          )}
+        </div>
+
+        <div className="text-right flex-shrink-0">
+          {editingAmount ? (
+            <input
+              type="number"
+              value={tempAmount}
+              onChange={e => setTempAmount(e.target.value)}
+              onBlur={handleSaveAmount}
+              onKeyDown={e => e.key === 'Enter' && handleSaveAmount()}
+              className="w-24 px-2 py-1 border border-stone-300 rounded-lg text-right text-sm font-semibold outline-none focus:border-stone-900"
+              autoFocus
+            />
+          ) : (
+            <button
+              onClick={() => { setTempAmount(item.amount.toString()); setEditingAmount(true); }}
+              className="text-right active:opacity-50"
+            >
+              <div className="text-base font-bold tabular-nums">{formatEUR(item.amount)}</div>
+              <div className="text-[10px] text-stone-400 uppercase tracking-wider">
+                {FREQUENCY_META[item.frequency].short}
+              </div>
+            </button>
+          )}
+          {isNotMonthly && (
+            <div className="text-[10px] text-stone-500 tabular-nums mt-0.5">
+              ≈ {formatEUR(monthly)}/mese
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-stone-100">
+        <div className="flex items-center gap-2 text-[11px] text-stone-500">
+          <span>{FREQUENCY_META[item.frequency].label}</span>
+        </div>
+        <button onClick={onEdit} className="text-[11px] text-stone-600 font-medium px-2 py-0.5 active:bg-stone-100 rounded flex items-center gap-1">
+          <Edit3 className="w-3 h-3" />
+          Modifica
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const IncomeItemEditor = ({ item, onClose, onSave }) => {
+  const [name, setName] = useState(item.name);
+  const [amount, setAmount] = useState(item.amount.toString());
+  const [frequency, setFrequency] = useState(item.frequency);
+  const [active, setActive] = useState(item.active);
+  const [note, setNote] = useState(item.note || '');
+
+  const handleSave = () => {
+    const n = parseFloat(amount);
+    if (isNaN(n) || n < 0) return;
+    onSave({ name, amount: n, frequency, active, note: note || undefined });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-30 flex items-end" onClick={onClose}>
+      <div className="bg-white w-full rounded-t-3xl p-4 pb-8 max-w-md mx-auto" onClick={e => e.stopPropagation()}>
+        <div className="w-12 h-1 bg-stone-300 rounded-full mx-auto mb-4" />
+        <h2 className="text-lg font-semibold mb-4">Modifica entrata</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-stone-500 font-medium block mb-1">Nome</label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Stipendio, pensione, affitto attivo..."
+              className="w-full px-3 py-2 bg-stone-100 rounded-xl text-sm outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-stone-500 font-medium block mb-1">Importo (€)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              className="w-full px-3 py-2 bg-stone-100 rounded-xl text-sm outline-none tabular-nums"
+            />
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-stone-500 font-medium block mb-2">Frequenza</label>
+            <div className="grid grid-cols-3 gap-2">
+              {Object.entries(FREQUENCY_META).map(([k, v]) => (
+                <button
+                  key={k}
+                  onClick={() => setFrequency(k)}
+                  className={`p-2 rounded-xl text-xs font-medium ${frequency === k ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'}`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-stone-500 font-medium block mb-1">Nota (opzionale)</label>
+            <input
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              className="w-full px-3 py-2 bg-stone-100 rounded-xl text-sm outline-none"
+            />
+          </div>
+
+          <button
+            onClick={() => setActive(!active)}
+            className="w-full p-3 rounded-xl border border-stone-200 flex items-center justify-between"
+          >
+            <span className="text-sm font-medium">{active ? 'Entrata attiva' : 'Entrata dormiente'}</span>
+            <div className={`w-10 h-6 rounded-full p-0.5 transition-colors ${active ? 'bg-emerald-500' : 'bg-stone-300'}`}>
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${active ? 'translate-x-4' : ''}`} />
+            </div>
+          </button>
+        </div>
+
+        <div className="flex gap-2 mt-6">
+          <button onClick={onClose} className="flex-1 py-3 bg-stone-100 text-stone-700 rounded-xl text-sm font-medium">
+            Annulla
+          </button>
+          <button
+            onClick={handleSave}
+            className="flex-1 py-3 bg-stone-900 text-white rounded-xl text-sm font-medium"
+          >
+            Salva
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ============= PATRIMONY PAGE =============
 
 const PatrimonyPage = ({ state, onNavigate, onUpdate }) => {
@@ -980,7 +1310,7 @@ const PatrimonyPage = ({ state, onNavigate, onUpdate }) => {
         </div>
       </div>
 
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-12 bg-stone-50 z-10 py-2">
+      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-[104px] bg-stone-50 z-[5] py-2">
         {[
           { id: 'all', label: 'Tutti' },
           { id: 'reserve', label: 'Reserve' },
@@ -1643,6 +1973,8 @@ export default function SoldiLabPrototype() {
         return <Dashboard state={state} onNavigate={setPage} onOpenSpaceSwitcher={() => setShowSpaceSwitcher(true)} />;
       case 'floor':
         return <FloorPage state={state} onNavigate={setPage} onUpdate={handleUpdate} />;
+      case 'income':
+        return <IncomePage state={state} onNavigate={setPage} onUpdate={handleUpdate} />;
       case 'patrimony':
         return <PatrimonyPage state={state} onNavigate={setPage} onUpdate={handleUpdate} />;
       case 'cycle':
@@ -1659,6 +1991,7 @@ export default function SoldiLabPrototype() {
   return (
     <div className="min-h-screen bg-stone-50 font-sans antialiased">
       <div className="max-w-md mx-auto bg-stone-50 min-h-screen relative">
+        <AppHeader />
         {renderPage()}
         <BottomNav current={page} onChange={setPage} />
         {showSpaceSwitcher && (

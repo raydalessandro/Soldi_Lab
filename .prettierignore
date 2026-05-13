@@ -1,0 +1,11 @@
+.next/
+out/
+node_modules/
+pnpm-lock.yaml
+public/
+prototype/
+playwright-report/
+test-results/
+coverage/
+SPEC.md
+LICENSE
