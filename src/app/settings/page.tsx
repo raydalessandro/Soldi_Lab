@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/PageHeader";
+import { BackupSection } from "@/components/settings/BackupSection";
 import { SpaceListEditor } from "@/components/SpaceListEditor";
 
 export const metadata = { title: "Impostazioni" };
@@ -19,9 +20,7 @@ export default function SettingsPage() {
           <h2 className="mb-2 px-1 text-xs font-semibold tracking-widest text-stone-400 uppercase">
             Dati
           </h2>
-          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 text-sm text-stone-500">
-            Backup e import JSON arrivano in F9.
-          </div>
+          <BackupSection />
         </section>
 
         <section>
