@@ -6,9 +6,10 @@ test.describe("smoke", () => {
     page,
   }) => {
     await completeOnboarding(page);
-    await expect(
-      page.getByRole("heading", { name: "Dashboard" }),
-    ).toBeVisible();
+    // Dashboard mostra i tre numeri grandi (SPEC §9.2).
+    await expect(page.getByText("Floor mensile")).toBeVisible();
+    await expect(page.getByText("Margine reale")).toBeVisible();
+    await expect(page.getByText("Patrimonio totale")).toBeVisible();
     await expect(page.getByText("Soldi_Lab").first()).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Navigazione principale" }),

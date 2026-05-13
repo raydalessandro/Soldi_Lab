@@ -10,5 +10,7 @@ export async function completeOnboarding(
   await page.getByRole("button", { name: "Salta" }).click();
   await page.getByLabel("Nome dello spazio").fill(spaceName);
   await page.getByRole("button", { name: "Inizia" }).click();
-  await page.getByRole("heading", { name: "Dashboard" }).waitFor();
+  // La Dashboard finita non ha più un h1: aspettiamo un elemento stabile,
+  // l'etichetta "Floor mensile" del primo BigNumber.
+  await page.getByText("Floor mensile").waitFor();
 }

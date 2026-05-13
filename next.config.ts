@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
 
   reactStrictMode: true,
+
+  // Disabilita la floating "N" del dev overlay che in `next dev` può
+  // intercettare i click di Playwright sui link in fondo allo schermo
+  // (BottomNav). Non ha effetto in produzione: serve solo al run di test.
+  devIndicators: false,
 };
 
 export default nextConfig;

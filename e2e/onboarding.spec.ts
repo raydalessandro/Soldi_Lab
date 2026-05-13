@@ -32,10 +32,9 @@ test.describe("onboarding & spaces", () => {
     await nameInput.fill("Casa Test");
     await page.getByRole("button", { name: "Inizia" }).click();
 
-    // Atterra in Dashboard con SpaceContextBar che mostra il nome scelto.
-    await expect(
-      page.getByRole("heading", { name: "Dashboard" }),
-    ).toBeVisible();
+    // Atterra in Dashboard con SpaceContextBar che mostra il nome scelto
+    // e i tre numeri grandi (Floor / Margine / Patrimonio).
+    await expect(page.getByText("Floor mensile")).toBeVisible();
     await expect(page.getByText("Casa Test").first()).toBeVisible();
   });
 

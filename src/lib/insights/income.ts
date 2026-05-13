@@ -8,18 +8,21 @@ import type { IncomeItem } from "../types";
 export interface IncomeBreakdown {
   totalMonthly: number;
   monthlyByItemId: Record<string, number>;
+  activeCount: number;
 }
 
 export function computeIncomeBreakdown(items: IncomeItem[]): IncomeBreakdown {
   const monthlyByItemId: Record<string, number> = {};
   let totalMonthly = 0;
+  let activeCount = 0;
   for (const item of items) {
     const monthly = toMonthly(item.amount, item.frequency);
     monthlyByItemId[item.id] = monthly;
     if (!item.active || item.archived_at !== null) continue;
     totalMonthly += monthly;
+    activeCount += 1;
   }
-  return { totalMonthly, monthlyByItemId };
+  return { totalMonthly, monthlyByItemId, activeCount };
 }
 
 // Ordinamento: prima per importo mensile decrescente, poi nome it.
