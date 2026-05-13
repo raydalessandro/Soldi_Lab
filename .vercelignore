@@ -1,0 +1,13 @@
+e2e
+playwright-report
+test-results
+coverage
+prototype
+scripts
+*.test.ts
+*.test.tsx
+playwright.config.ts
+vitest.config.ts
+vitest.setup.ts
+.prettierrc.json
+.prettierignore
