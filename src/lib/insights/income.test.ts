@@ -22,7 +22,9 @@ function ii(
 
 describe("computeIncomeBreakdown", () => {
   it("returns zero on empty list", () => {
-    expect(computeIncomeBreakdown([]).totalMonthly).toBe(0);
+    const r = computeIncomeBreakdown([]);
+    expect(r.totalMonthly).toBe(0);
+    expect(r.activeCount).toBe(0);
   });
 
   it("sums normalised monthly amounts of active rows", () => {
@@ -33,12 +35,14 @@ describe("computeIncomeBreakdown", () => {
     expect(computeIncomeBreakdown(items).totalMonthly).toBe(2575);
   });
 
-  it("excludes inactive rows", () => {
+  it("excludes inactive rows from total and activeCount", () => {
     const items = [
       ii({ amount: 2400, frequency: "monthly" }),
       ii({ amount: 500, frequency: "monthly", active: false }),
     ];
-    expect(computeIncomeBreakdown(items).totalMonthly).toBe(2400);
+    const r = computeIncomeBreakdown(items);
+    expect(r.totalMonthly).toBe(2400);
+    expect(r.activeCount).toBe(1);
   });
 
   it("excludes archived rows", () => {
