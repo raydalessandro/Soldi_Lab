@@ -2,6 +2,7 @@
 
 import { AlertCircle, ChevronRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { SpaceContextBar } from "@/components/SpaceContextBar";
 import { AccumulationCard } from "@/components/dashboard/AccumulationCard";
 import { BigNumber } from "@/components/dashboard/BigNumber";
@@ -28,6 +29,7 @@ export default function DashboardPage() {
   return (
     <>
       <SpaceContextBar />
+      <InstallPrompt />
 
       {!insights ? (
         <div className="px-4 pt-6 text-sm text-stone-400">Caricamento…</div>

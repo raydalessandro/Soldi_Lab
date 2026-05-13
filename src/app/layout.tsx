@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppBootstrap } from "@/components/AppBootstrap";
 import { AppHeader } from "@/components/AppHeader";
 import { BottomNav } from "@/components/BottomNav";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { SpaceSwitcherMount } from "@/components/SpaceSwitcherMount";
 
 const inter = Inter({
@@ -59,6 +60,7 @@ export default function RootLayout({
           </main>
           <BottomNav />
           <SpaceSwitcherMount />
+          <ServiceWorkerRegister />
         </div>
       </body>
     </html>

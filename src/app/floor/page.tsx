@@ -2,6 +2,7 @@
 
 import { Info, Plus, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { PageHeader } from "@/components/PageHeader";
 import { FloorFilters } from "@/components/floor/FloorFilters";
 import { FloorHeader } from "@/components/floor/FloorHeader";
@@ -62,6 +63,12 @@ export default function FloorPage() {
             </button>
           </div>
         }
+      />
+
+      <OnboardingBanner
+        storageKey="floor-rule"
+        title="Cosa entra nel Floor"
+        body="Solo spese permanenti strutturali. Il discrezionale (caffè, cene, regali) sta fuori e si gestisce sul margine."
       />
 
       <FloorHeader breakdown={breakdown} />

@@ -2,6 +2,7 @@
 
 import { Check, Copy, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { PageHeader } from "@/components/PageHeader";
 import { InsightCard } from "@/components/advisor/InsightCard";
 import { buildInsightCards } from "@/components/advisor/buildInsightCards";
@@ -64,6 +65,13 @@ export default function AdvisorPage() {
   return (
     <>
       <PageHeader title="Advisor" />
+
+      <OnboardingBanner
+        storageKey="advisor-intro"
+        title="Insight + export"
+        body="Qui leggi osservazioni sui tuoi dati attuali. Il pulsante in fondo genera un blocco markdown da incollare in qualunque LLM."
+        tone="emerald"
+      />
 
       <div className="px-4 py-4">
         <div className="mb-1 flex items-center gap-2">
