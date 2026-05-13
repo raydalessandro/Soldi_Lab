@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { completeOnboarding } from "./helpers";
 
 test.describe("smoke", () => {
-  test("dashboard loads, header and bottom nav are visible", async ({
+  test("dashboard loads after onboarding, header and bottom nav are visible", async ({
     page,
   }) => {
-    await page.goto("/");
+    await completeOnboarding(page);
     await expect(
       page.getByRole("heading", { name: "Dashboard" }),
     ).toBeVisible();
@@ -14,7 +15,11 @@ test.describe("smoke", () => {
     ).toBeVisible();
   });
 
-  test("parent app link points to la-famiglia-alpha", async ({ page }) => {
+  test("parent app link is reachable even from the welcome screen", async ({
+    page,
+  }) => {
+    // L'AppHeader vive in layout, fuori dall'AppBootstrap, quindi il link
+    // è sempre presente sia in onboarding che dopo.
     await page.goto("/");
     const link = page.getByRole("link", { name: /La Famiglia/i });
     await expect(link).toHaveAttribute(
@@ -24,8 +29,10 @@ test.describe("smoke", () => {
     await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("bottom nav reaches every section", async ({ page }) => {
-    await page.goto("/");
+  test("bottom nav reaches every section after onboarding", async ({
+    page,
+  }) => {
+    await completeOnboarding(page);
     for (const [label, expectedTitle] of [
       ["Floor", "Floor"],
       ["Entrate", "Entrate"],
