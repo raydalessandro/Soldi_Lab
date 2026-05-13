@@ -296,7 +296,7 @@ function computeInsights(floor, income, assets) {
 // ============= COMPONENTI BASE =============
 
 const PageHeader = ({ title, onBack, action }) => (
-  <div className="sticky top-0 z-10 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between">
+  <div className="sticky top-[52px] z-10 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between">
     <div className="flex items-center gap-3">
       {onBack && (
         <button onClick={onBack} className="p-1 -ml-1 active:bg-stone-100 rounded-lg">
@@ -309,15 +309,16 @@ const PageHeader = ({ title, onBack, action }) => (
   </div>
 );
 
-// Header globale: logo Soldi_Lab a sinistra (placeholder) + link diretto all'app madre La Famiglia Alpha.
-// Quando il logo dell'app verrà fornito sostituirà il blocco "SL" qui sotto e diventerà anche icona PWA.
+// Header globale sticky: logo Soldi_Lab a sinistra + link diretto all'app madre La Famiglia Alpha.
+// Il logo è anche l'icona PWA quando l'app viene installata sul telefono.
 const AppHeader = () => (
-  <div className="bg-white border-b border-stone-200 px-4 py-2 flex items-center justify-between">
+  <div className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200 px-4 py-2 flex items-center justify-between">
     <div className="flex items-center gap-2">
-      {/* Placeholder logo Soldi_Lab — da sostituire quando l'asset è disponibile */}
-      <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center text-white font-bold text-[11px] tracking-tight">
-        SL
-      </div>
+      <img
+        src="./assets/logo.png"
+        alt="Soldi_Lab"
+        className="w-9 h-9 rounded-lg object-cover"
+      />
       <div className="leading-tight">
         <div className="text-[9px] uppercase tracking-widest text-stone-400 font-medium">Polo B</div>
         <div className="text-xs font-semibold tracking-tight">Soldi_Lab</div>
@@ -715,7 +716,7 @@ const FloorPage = ({ state, onNavigate, onUpdate }) => {
       </div>
 
       {/* Filtri */}
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-12 bg-stone-50 z-10 py-2">
+      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-[104px] bg-stone-50 z-[5] py-2">
         {[
           { id: 'all', label: 'Tutte' },
           { id: 'essential', label: 'Essenziale' },
@@ -1309,7 +1310,7 @@ const PatrimonyPage = ({ state, onNavigate, onUpdate }) => {
         </div>
       </div>
 
-      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-12 bg-stone-50 z-10 py-2">
+      <div className="px-4 pb-2 flex gap-2 overflow-x-auto sticky top-[104px] bg-stone-50 z-[5] py-2">
         {[
           { id: 'all', label: 'Tutti' },
           { id: 'reserve', label: 'Reserve' },
