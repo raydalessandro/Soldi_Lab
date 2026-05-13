@@ -27,6 +27,7 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
   const [active, setActive] = useState(item?.active ?? true);
   const [note, setNote] = useState(item?.note ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSave =
     name.trim().length > 0 &&
@@ -37,6 +38,7 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
     if (!canSave || submitting) return;
     const n = parseFloat(amount.replace(",", "."));
     setSubmitting(true);
+    setError(null);
     try {
       if (item) {
         await updateIncomeItem(item.id, {
@@ -57,6 +59,8 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
         });
       }
       onClose();
+    } catch (err) {
+      setError(formatError(err));
     } finally {
       setSubmitting(false);
     }
@@ -64,9 +68,14 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
 
   const onArchiveToggle = async () => {
     if (!item) return;
-    if (item.archived_at) await unarchiveIncomeItem(item.id);
-    else await archiveIncomeItem(item.id);
-    onClose();
+    setError(null);
+    try {
+      if (item.archived_at) await unarchiveIncomeItem(item.id);
+      else await archiveIncomeItem(item.id);
+      onClose();
+    } catch (err) {
+      setError(formatError(err));
+    }
   };
 
   return (
@@ -189,6 +198,15 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
           )}
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900"
+          >
+            {error}
+          </div>
+        )}
+
         <div className="mt-6 flex gap-2">
           <button
             type="button"
@@ -214,6 +232,11 @@ export function IncomeItemForm({ item, spaceId, onClose }: Props) {
       </div>
     </div>
   );
+}
+
+function formatError(err: unknown): string {
+  if (err instanceof Error) return err.message || "Errore sconosciuto";
+  return String(err);
 }
 
 function Field({
