@@ -43,6 +43,7 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
   );
   const [note, setNote] = useState(item?.note ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Quando l'utente marca "vita variabile" forziamo essential + variable
   // (vincolo SPEC §2.1).
@@ -64,6 +65,7 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
     if (!canSave || submitting) return;
     const n = parseFloat(amount.replace(",", "."));
     setSubmitting(true);
+    setError(null);
     try {
       if (item) {
         await updateFloorItem(item.id, {
@@ -90,6 +92,10 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
         });
       }
       onClose();
+    } catch (err) {
+      // Mostriamo l'errore in UI invece di lasciarlo come unhandled promise
+      // rejection (era il caso silenzioso che faceva pensare "form bloccato").
+      setError(formatError(err));
     } finally {
       setSubmitting(false);
     }
@@ -97,9 +103,14 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
 
   const onArchiveToggle = async () => {
     if (!item) return;
-    if (item.archived_at) await unarchiveFloorItem(item.id);
-    else await archiveFloorItem(item.id);
-    onClose();
+    setError(null);
+    try {
+      if (item.archived_at) await unarchiveFloorItem(item.id);
+      else await archiveFloorItem(item.id);
+      onClose();
+    } catch (err) {
+      setError(formatError(err));
+    }
   };
 
   return (
@@ -308,6 +319,15 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
           )}
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900"
+          >
+            {error}
+          </div>
+        )}
+
         <div className="mt-6 flex gap-2">
           <button
             type="button"
@@ -333,6 +353,13 @@ export function FloorItemForm({ item, spaceId, onClose }: FloorItemFormProps) {
       </div>
     </div>
   );
+}
+
+// Estrae un messaggio sensato per l'utente da un errore qualsiasi.
+// Usato dai try/catch dei form per non perdere mai un fallimento.
+function formatError(err: unknown): string {
+  if (err instanceof Error) return err.message || "Errore sconosciuto";
+  return String(err);
 }
 
 function Field({

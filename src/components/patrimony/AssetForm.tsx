@@ -41,6 +41,7 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
   const [maturityDate, setMaturityDate] = useState(asset?.maturity_date ?? "");
   const [note, setNote] = useState(asset?.note ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSave =
     name.trim().length > 0 &&
@@ -56,6 +57,7 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
   const onSave = async () => {
     if (!canSave || submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       const value = parseFloat(currentValue.replace(",", "."));
       const payload = {
@@ -74,6 +76,8 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
         await createAsset({ space_id: spaceId, ...payload });
       }
       onClose();
+    } catch (err) {
+      setError(formatError(err));
     } finally {
       setSubmitting(false);
     }
@@ -81,9 +85,14 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
 
   const onArchiveToggle = async () => {
     if (!asset) return;
-    if (asset.archived_at) await unarchiveAsset(asset.id);
-    else await archiveAsset(asset.id);
-    onClose();
+    setError(null);
+    try {
+      if (asset.archived_at) await unarchiveAsset(asset.id);
+      else await archiveAsset(asset.id);
+      onClose();
+    } catch (err) {
+      setError(formatError(err));
+    }
   };
 
   return (
@@ -246,6 +255,15 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
           )}
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900"
+          >
+            {error}
+          </div>
+        )}
+
         <div className="mt-6 flex gap-2">
           <button
             type="button"
@@ -271,6 +289,11 @@ export function AssetForm({ asset, spaceId, onClose }: Props) {
       </div>
     </div>
   );
+}
+
+function formatError(err: unknown): string {
+  if (err instanceof Error) return err.message || "Errore sconosciuto";
+  return String(err);
 }
 
 function Field({

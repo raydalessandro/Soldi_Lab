@@ -1,23 +1,14 @@
 // Service worker minimo per Soldi_Lab.
 //
-// Strategia:
-//  - precache delle route principali + manifest + icone all'install
-//  - fetch handler stale-while-revalidate per asset Next (/_next/static/*)
-//    e network-first con fallback cache per le route HTML
-//  - quando offline e la cache non ha la risorsa, fallback alla home
-//
-// Quando il manifesto della versione cambia (CACHE_NAME), il SW cancella
-// la vecchia cache all'activate.
+// Storia di v1 → v2: nella v1 pre-cachavamo tutte le route HTML
+// all'install. Su un nuovo deploy il browser poteva continuare a servire
+// la vecchia HTML (con chunk hash obsoleti), causando crash silenziosi e
+// dati che apparivano persi. Da v2 precachiamo solo asset stabili (icone
+// e manifest); le route HTML vengono cached opportunisticamente solo dopo
+// la prima visita reale, e seguono comunque la strategia network-first.
 
-const CACHE_NAME = "soldi-lab-v1";
-const PRECACHE_URLS = [
-  "/",
-  "/floor/",
-  "/income/",
-  "/patrimony/",
-  "/cycle/",
-  "/advisor/",
-  "/settings/",
+const CACHE_NAME = "soldi-lab-v2";
+const STABLE_PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
@@ -31,14 +22,12 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      // addAll fallisce all-or-nothing: usiamo add per non bloccare il
-      // SW se una singola risorsa manca temporaneamente in dev.
       await Promise.all(
-        PRECACHE_URLS.map(async (url) => {
+        STABLE_PRECACHE_URLS.map(async (url) => {
           try {
             await cache.add(url);
           } catch {
-            // ignora il singolo, non bloccare l'install
+            // non bloccare l'install per una singola risorsa
           }
         }),
       );
@@ -63,22 +52,27 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
-  // Solo same-origin: niente proxying di terze parti
   if (url.origin !== self.location.origin) return;
 
-  // Asset versionati di Next: stale-while-revalidate
+  // Asset versionati di Next: stale-while-revalidate.
+  // I filename includono hash, quindi una versione vecchia non collide.
   if (url.pathname.startsWith("/_next/")) {
     event.respondWith(staleWhileRevalidate(req));
     return;
   }
 
-  // Naviga (HTML): network-first, fallback cache, ultimate fallback "/"
-  if (req.mode === "navigate" || req.headers.get("accept")?.includes("text/html")) {
-    event.respondWith(networkFirst(req));
+  // Naviga (HTML): network-first. Se siamo offline serviamo l'ultima HTML
+  // che abbiamo (se mai cached); niente fallback a "/" perché può servire
+  // un layout incoerente con la rotta corrente.
+  if (
+    req.mode === "navigate" ||
+    req.headers.get("accept")?.includes("text/html")
+  ) {
+    event.respondWith(networkFirstHtml(req));
     return;
   }
 
-  // Tutto il resto (manifest, icone, json): cache-first
+  // Tutto il resto (manifest, icone, json): cache-first.
   event.respondWith(cacheFirst(req));
 });
 
@@ -95,7 +89,7 @@ async function cacheFirst(req) {
   }
 }
 
-async function networkFirst(req) {
+async function networkFirstHtml(req) {
   const cache = await caches.open(CACHE_NAME);
   try {
     const fresh = await fetch(req);
@@ -103,9 +97,7 @@ async function networkFirst(req) {
     return fresh;
   } catch {
     const cached = await cache.match(req);
-    if (cached) return cached;
-    const fallback = await cache.match("/");
-    return fallback ?? Response.error();
+    return cached ?? Response.error();
   }
 }
 

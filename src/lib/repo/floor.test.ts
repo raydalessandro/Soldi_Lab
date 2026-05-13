@@ -200,4 +200,51 @@ describe("floor repository", () => {
     );
     expect(active.map((i) => i.name)).toEqual(["ess"]);
   });
+
+  it("persists 10 sequential createFloorItem calls without losing any", async () => {
+    // Regressione del bug "alla terza voce si blocca": tutti gli insert
+    // devono finire nel DB e avere id distinti.
+    const created = [];
+    for (let i = 0; i < 10; i++) {
+      created.push(
+        await createFloorItem(
+          {
+            space_id: space.id,
+            name: `Voce ${i}`,
+            amount: 100 + i,
+            frequency: "monthly",
+            type: "fixed",
+            necessity_level: "essential",
+          },
+          db,
+        ),
+      );
+    }
+    const ids = new Set(created.map((i) => i.id));
+    expect(ids.size).toBe(10);
+    const stored = await listFloorItems({ space_id: space.id }, db);
+    expect(stored.length).toBe(10);
+  });
+
+  it("persists 10 parallel createFloorItem calls", async () => {
+    // Race condition harness: tutte le promise risolvono e tutti i record
+    // arrivano in DB.
+    const calls = Array.from({ length: 10 }).map((_, i) =>
+      createFloorItem(
+        {
+          space_id: space.id,
+          name: `Parallel ${i}`,
+          amount: i + 1,
+          frequency: "monthly",
+          type: "fixed",
+          necessity_level: "essential",
+        },
+        db,
+      ),
+    );
+    const results = await Promise.all(calls);
+    const ids = new Set(results.map((i) => i.id));
+    expect(ids.size).toBe(10);
+    expect(await listFloorItems({ space_id: space.id }, db)).toHaveLength(10);
+  });
 });
